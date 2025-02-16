@@ -1,6 +1,11 @@
 name: Run Unit Tests
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
 
 jobs:
   run-unit-tests:
@@ -15,6 +20,18 @@ jobs:
           node-version: 18
           cache: 'npm'
 
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/prisma
+          key: ${{ runner.os }}-prisma-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-prisma-
+
       - run: npm ci
 
-      - run: npm run test
+      - run: npm run test -- --ci > test-results.txt
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test-results.txt
