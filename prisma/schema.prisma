@@ -20,4 +20,25 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  matchesAsPlayer1 Match[] @relation("Player1")
+  matchesAsPlayer2 Match[] @relation("Player2")
+  matchesWon       Match[] @relation("Winner")
+
+  @@map("users")
+}
+
+model Match {
+  id        String   @id @default(uuid())
+  player1   User     @relation("Player1", fields: [player1Id], references: [id])
+  player1Id String
+  player2   User     @relation("Player2", fields: [player2Id], references: [id])
+  player2Id String
+  winner    User?    @relation("Winner", fields: [winnerId], references: [id])
+  winnerId  String?
+  score1    Int
+  score2    Int
+  createdAt DateTime @default(now())
+
+  @@map("matches")
 }
